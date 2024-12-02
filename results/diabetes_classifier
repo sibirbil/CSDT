@@ -1,0 +1,231 @@
+// Decision Tree
+digraph {
+	1 [label="s5 <= 0.022
+Count: 353
+Feature ID: 8
+Error: 6130.698" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	2 [label="bmi <= 0.005
+Count: 240
+Feature ID: 2
+Error: 4113.098" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	1 -> 2 [label=Left]
+	4 [label="s3 <= 0.021
+Count: 178
+Feature ID: 6
+Error: 2467.151" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	2 -> 4 [label=Left]
+	8 [label="s5 <= -0.043
+Count: 100
+Feature ID: 8
+Error: 3122.957" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	4 -> 8 [label=Left]
+	16 [label="age <= -0.091
+Count: 24
+Feature ID: 0
+Error: 1964.604" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	8 -> 16 [label=Left]
+	32 [label="Pred: [121.83333333]
+Count: 6
+Error: 2449.139" fontsize=10 height=0.4 shape=box width=0.7]
+	16 -> 32 [label=Left]
+	33 [label="Pred: [74.38888889]
+Count: 18
+Error: 1240.349" fontsize=10 height=0.4 shape=box width=0.7]
+	16 -> 33 [label=Right]
+	17 [label="s2 <= -0.045
+Count: 76
+Feature ID: 5
+Error: 3126.663" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	8 -> 17 [label=Right]
+	34 [label="Pred: [166.09090909]
+Count: 11
+Error: 2466.628" fontsize=10 height=0.4 shape=box width=0.7]
+	17 -> 34 [label=Left]
+	35 [label="Pred: [118.15384615]
+Count: 65
+Error: 2905.761" fontsize=10 height=0.4 shape=box width=0.7]
+	17 -> 35 [label=Right]
+	9 [label="bp <= -0.044
+Count: 78
+Feature ID: 3
+Error: 1135.317" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	4 -> 9 [label=Right]
+	18 [label="s5 <= -0.034
+Count: 20
+Feature ID: 8
+Error: 699.940" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	9 -> 18 [label=Left]
+	36 [label="Pred: [60.30769231]
+Count: 13
+Error: 268.521" fontsize=10 height=0.4 shape=box width=0.7]
+	18 -> 36 [label=Left]
+	37 [label="Pred: [92.57142857]
+Count: 7
+Error: 824.531" fontsize=10 height=0.4 shape=box width=0.7]
+	18 -> 37 [label=Right]
+	19 [label="sex <= 0.003
+Count: 58
+Feature ID: 1
+Error: 1186.528" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	9 -> 19 [label=Right]
+	38 [label="Pred: [98.6]
+Count: 40
+Error: 1348.640" fontsize=10 height=0.4 shape=box width=0.7]
+	19 -> 38 [label=Left]
+	39 [label="Pred: [74.88888889]
+Count: 18
+Error: 438.543" fontsize=10 height=0.4 shape=box width=0.7]
+	19 -> 39 [label=Right]
+	5 [label="bp <= 0.024
+Count: 62
+Feature ID: 3
+Error: 5195.184" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	2 -> 5 [label=Right]
+	10 [label="s3 <= -0.001
+Count: 40
+Feature ID: 6
+Error: 2975.024" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	5 -> 10 [label=Left]
+	20 [label="age <= -0.025
+Count: 28
+Feature ID: 0
+Error: 2579.034" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	10 -> 20 [label=Left]
+	40 [label="Pred: [193.5]
+Count: 8
+Error: 3066.000" fontsize=10 height=0.4 shape=box width=0.7]
+	20 -> 40 [label=Left]
+	41 [label="Pred: [147.35]
+Count: 20
+Error: 1775.727" fontsize=10 height=0.4 shape=box width=0.7]
+	20 -> 41 [label=Right]
+	21 [label="bp <= -0.006
+Count: 12
+Feature ID: 3
+Error: 2520.972" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	10 -> 21 [label=Right]
+	42 [label="Pred: [99.57142857]
+Count: 7
+Error: 1785.673" fontsize=10 height=0.4 shape=box width=0.7]
+	21 -> 42 [label=Left]
+	43 [label="Pred: [139.4]
+Count: 5
+Error: 2625.040" fontsize=10 height=0.4 shape=box width=0.7]
+	21 -> 43 [label=Right]
+	11 [label="bmi <= 0.076
+Count: 22
+Feature ID: 2
+Error: 5853.242" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	5 -> 11 [label=Right]
+	22 [label="bp <= 0.034
+Count: 17
+Feature ID: 3
+Error: 6186.720" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	11 -> 22 [label=Left]
+	44 [label="Pred: [242.]
+Count: 5
+Error: 5216.000" fontsize=10 height=0.4 shape=box width=0.7]
+	22 -> 44 [label=Left]
+	45 [label="Pred: [188.83333333]
+Count: 12
+Error: 5759.806" fontsize=10 height=0.4 shape=box width=0.7]
+	22 -> 45 [label=Right]
+	23 [label="Pred: [271.]
+Count: 5
+Error: 1299.200" fontsize=10 height=0.4 shape=box width=0.7]
+	11 -> 23 [label=Right]
+	3 [label="bmi <= 0.013
+Count: 113
+Feature ID: 2
+Error: 4168.562" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	1 -> 3 [label=Right]
+	6 [label="s4 <= 0.100
+Count: 46
+Feature ID: 7
+Error: 3917.460" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	3 -> 6 [label=Left]
+	12 [label="s1 <= 0.075
+Count: 41
+Feature ID: 4
+Error: 3572.543" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	6 -> 12 [label=Left]
+	24 [label="s6 <= 0.026
+Count: 32
+Feature ID: 9
+Error: 3267.413" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	12 -> 24 [label=Left]
+	48 [label="Pred: [164.45]
+Count: 20
+Error: 3029.047" fontsize=10 height=0.4 shape=box width=0.7]
+	24 -> 48 [label=Left]
+	49 [label="Pred: [202.33333333]
+Count: 12
+Error: 2767.722" fontsize=10 height=0.4 shape=box width=0.7]
+	24 -> 49 [label=Right]
+	25 [label="Pred: [123.22222222]
+Count: 9
+Error: 2259.062" fontsize=10 height=0.4 shape=box width=0.7]
+	12 -> 25 [label=Right]
+	13 [label="Pred: [250.2]
+Count: 5
+Error: 499.760" fontsize=10 height=0.4 shape=box width=0.7]
+	6 -> 13 [label=Right]
+	7 [label="bmi <= 0.056
+Count: 67
+Feature ID: 2
+Error: 2376.205" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	3 -> 7 [label=Right]
+	14 [label="bmi <= 0.051
+Count: 32
+Feature ID: 2
+Error: 1793.715" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	7 -> 14 [label=Left]
+	28 [label="s5 <= 0.063
+Count: 27
+Feature ID: 8
+Error: 1644.414" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	14 -> 28 [label=Left]
+	56 [label="Pred: [221.22222222]
+Count: 18
+Error: 1720.951" fontsize=10 height=0.4 shape=box width=0.7]
+	28 -> 56 [label=Left]
+	57 [label="Pred: [255.77777778]
+Count: 9
+Error: 695.284" fontsize=10 height=0.4 shape=box width=0.7]
+	28 -> 57 [label=Right]
+	29 [label="Pred: [184.4]
+Count: 5
+Error: 628.240" fontsize=10 height=0.4 shape=box width=0.7]
+	14 -> 29 [label=Right]
+	15 [label="s2 <= 0.022
+Count: 35
+Feature ID: 5
+Error: 2217.605" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	7 -> 15 [label=Right]
+	30 [label="s5 <= 0.031
+Count: 24
+Feature ID: 8
+Error: 943.104" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	15 -> 30 [label=Left]
+	60 [label="Pred: [312.6]
+Count: 5
+Error: 988.640" fontsize=10 height=0.4 shape=box width=0.7]
+	30 -> 60 [label=Left]
+	61 [label="Pred: [273.]
+Count: 19
+Error: 604.421" fontsize=10 height=0.4 shape=box width=0.7]
+	30 -> 61 [label=Right]
+	31 [label="s5 <= 0.060
+Count: 11
+Feature ID: 8
+Error: 2743.719" fontsize=10 height=0.5 shape=ellipse width=0.9]
+	15 -> 31 [label=Right]
+	62 [label="Pred: [188.8]
+Count: 5
+Error: 2810.160" fontsize=10 height=0.4 shape=box width=0.7]
+	31 -> 62 [label=Left]
+	63 [label="Pred: [253.16666667]
+Count: 6
+Error: 805.139" fontsize=10 height=0.4 shape=box width=0.7]
+	31 -> 63 [label=Right]
+}
