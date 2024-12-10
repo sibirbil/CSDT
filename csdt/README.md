@@ -121,6 +121,7 @@ Contributions are welcome! If you'd like to contribute, follow these steps:
 
 - **Çağla Mıdıklı** - [GitHub](https://github.com/cagla0117)
 - **İlker Birbil** - [GitHub](https://github.com/sibirbil)
+- **Doğanay Özese** - [GitHub](https://github.com/dozese)
 
 ---
 
