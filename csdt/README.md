@@ -2,9 +2,6 @@
 
 **CSDT** is a Python library designed for building and using decision trees with custom split criteria. It provides flexibility and control for machine learning projects, allowing users to define custom split logic and visualize the resulting trees.
 
-
-Explore the project on the official website: [Custom Split Decision Tree](https://custom-split-decision-tree.github.io/)
-
 ---
 
 ## Features
@@ -124,12 +121,12 @@ Contributions are welcome! If you'd like to contribute, follow these steps:
 
 - **Çağla Mıdıklı** - [GitHub](https://github.com/cagla0117)
 - **İlker Birbil** - [GitHub](https://github.com/sibirbil)
-- **Doğanay Özese** - [GitHub](https://github.com/dozese)
 
 ---
 
 ## Acknowledgments
 
 Special thanks to all contributors and the open-source community for their support in making this project possible.
+```
 
-
+---
