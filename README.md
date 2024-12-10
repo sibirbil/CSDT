@@ -27,7 +27,7 @@ pip install csdt
 Alternatively, you can clone the repository and install it locally:
 
 ```bash
-git clone hhttps://github.com/sibirbil/CSDT.git
+git clone https://github.com/sibirbil/CSDT.git
 cd CSDT
 pip install -e .
 ```
