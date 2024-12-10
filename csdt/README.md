@@ -127,6 +127,6 @@ Contributions are welcome! If you'd like to contribute, follow these steps:
 ## Acknowledgments
 
 Special thanks to all contributors and the open-source community for their support in making this project possible.
+```
 
 
----
