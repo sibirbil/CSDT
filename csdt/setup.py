@@ -12,7 +12,7 @@ setup(
     description="Custom Split Decision Tree",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/cagla0117/Custom-Split-Decision-Tree",
+    url="https://github.com/sibirbil/CSDT.git",
     packages=find_packages(),
     install_requires=[
         "matplotlib==3.8.1",
