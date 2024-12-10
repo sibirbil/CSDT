@@ -24,7 +24,7 @@ pip install csdt
 Alternatively, you can clone the repository and install it locally:
 
 ```bash
-git clone https://github.com/cagla0117/Custom-Split-Decision-Tree.git
+git clone https://github.com/sibirbil/CSDT.git
 cd Custom-Split-Decision-Tree
 pip install -e .
 ```
@@ -121,6 +121,8 @@ Contributions are welcome! If you'd like to contribute, follow these steps:
 
 - **Çağla Mıdıklı** - [GitHub](https://github.com/cagla0117)
 - **İlker Birbil** - [GitHub](https://github.com/sibirbil)
+- **Doğanay Özese** - [GitHub](https://github.com/dozese)
+
 
 ---
 
