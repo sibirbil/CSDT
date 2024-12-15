@@ -40,7 +40,8 @@ Here's an example of how to use **CSDT** to create and visualize a decision tree
 
 ```python
 import pandas as pd
-from csdt import CSDT
+from csdt import CSDT,split_criteria_with_methods
+import numpy as np 
 
 # Sample data
 data = pd.DataFrame({
@@ -51,9 +52,19 @@ data = pd.DataFrame({
 
 X = data[["feature1", "feature2"]]
 y = data[["target"]]
+def return_mean(y, x):
+        return y.mean(axis=0).astype(np.float64)  
 
+def calculate_mse(y, predictions):
+    errors = y - predictions
+    squared_errors = errors ** 2
+    mse = np.mean(squared_errors)
+    return np.float64(mse)
+        
+split_criteria = lambda y, x: split_criteria_with_methods(y, x,pred=return_mean, split_criteria= calculate_mse
+            )
 # Initialize the tree
-tree = CSDT(max_depth=3, min_samples_split=2, min_samples_leaf=1, verbose=True)
+tree = CSDT(max_depth=3, min_samples_split=2, min_samples_leaf=1, verbose=True,split_criteria=split_criteria)
 
 # Fit the tree
 tree.fit(X, y)
@@ -76,6 +87,12 @@ To use **CSDT**, make sure you have the following dependencies installed:
 - `pandas==2.2.3`
 - `scikit-learn==1.3.2`
 - `graphviz`
+- `gurobi=10.0.3`
+- `pip=23.3.1`
+- `python=3.11.6`
+- `seaborn=0.12.2`
+- `scipy=1.11.3`
+- `setuptools=68.2.2`
 
 If you use `conda`, you can create an environment with all required dependencies:
 
