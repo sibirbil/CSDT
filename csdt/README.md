@@ -82,31 +82,8 @@ To use **CSDT**, make sure you have the following dependencies installed:
 - `matplotlib==3.8.1`
 - `numpy==2.1.0`
 - `pandas==2.2.3`
-- `scikit-learn==1.3.2`
 - `graphviz`
 
-If you use `conda`, you can create an environment with all required dependencies:
-
-```bash
-conda env create -f csdt.yml
-conda activate csdt
-```
-
----
-
-## Conda Environment Setup
-
-For Conda users, you can create an environment using the provided `csdt.yml` file:
-
-1. Download or copy the `csdt.yml` file.
-2. Create the environment:
-   ```bash
-   conda env create -f csdt.yml
-   ```
-3. Activate the environment:
-   ```bash
-   conda activate csdt
-   ```
 
 ---
 
