@@ -6,7 +6,7 @@ with open(os.path.join(os.path.dirname(__file__), "README.md"), encoding="utf-8"
 
 setup(
     name="csdt",
-    version="1.0.2",
+    version="1.0.6",
     author="Çağla Mıdıklı, İlker Birbil",
     author_email="midiklicagla@gmail.com",
     description="Custom Split Decision Tree",

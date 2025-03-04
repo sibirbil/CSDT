@@ -1,0 +1,8 @@
+LICENSE
+README.md
+setup.py
+csdt.egg-info/PKG-INFO
+csdt.egg-info/SOURCES.txt
+csdt.egg-info/dependency_links.txt
+csdt.egg-info/requires.txt
+csdt.egg-info/top_level.txt
