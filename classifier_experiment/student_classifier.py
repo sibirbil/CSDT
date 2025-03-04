@@ -26,15 +26,14 @@ if __name__ == '__main__':
     csdt_depth = 15
     features_list = ['f0', 'f1', 'f2', 'f3', 'f4', 'f5', 'f6', 'f7', 'f8', 'f9', 'f10', 'f11', 'f12', 'f13', 'f14', 'f15', 'f16', 'f17', 'f18', 'f19', 'f20', 'f21', 'f22', 'f23', 'f24', 'f25', 'f26', 'f27', 'f28', 'f29', 'f30', 'f31']
     target_list = ['target']
-    base_folder = os.path.dirname(os.path.abspath(__file__))
 
-    df = pd.read_csv(os.path.join(base_folder, "../data/student.csv"))
+    df = pd.read_csv(os.path.join(base_folder, "datasets/student.csv"))
     features_df = df[features_list]
     target_df = df[target_list]
     
     X_train, X_test, y_train, y_test = train_test_split(features_df, target_df, test_size=0.2, random_state=SEED)
     
-    def calculate_gini(prediction, y):
+    def calculate_gini(prediction, y,initial_solutions):
         if y.size == 0 or np.unique(y).size == 1:
             return 0
 
@@ -57,10 +56,10 @@ if __name__ == '__main__':
         y_new = np.bincount(y_flat).argmax()
         return [np.int64(y_new)]
     
-    split_criteria = lambda y, x: split_criteria_with_methods(y, x, pred=return_majority, split_criteria=calculate_gini)
+    split_criteria = lambda y, x,initial_solutions: split_criteria_with_methods(y, x, pred=return_majority, split_criteria=calculate_gini,initial_solutions=initial_solutions)
     
     tree = CSDT(max_depth=csdt_depth, min_samples_leaf=csdt_min_samples_leaf, min_samples_split=csdt_min_samples_split,
-                split_criteria=split_criteria, verbose=verbose)
+                split_criteria=split_criteria, verbose=verbose,use_hashmaps=True,use_initial_solution=True)
     tree.fit(X_train, y_train)
     y_pred = tree.predict(X_test)
     
@@ -68,7 +67,7 @@ if __name__ == '__main__':
     y_pred_df['leaf_id'] = tree.apply(X_test)
     y_pred_df = y_pred_df.drop_duplicates()
     
-    ocdt_mse = calculate_gini(y_test, y_pred)
+    ocdt_mse = calculate_gini(y_test, y_pred,0)
     print(f'CSDT Gini: {ocdt_mse}')
 
     classifier = DecisionTreeClassifier( min_samples_leaf=csdt_min_samples_leaf,
@@ -80,7 +79,7 @@ if __name__ == '__main__':
     
     y_pred_sklearn = classifier.predict(X_test)
     y_pred_sklearn_df = pd.DataFrame(y_pred_sklearn, columns=target_list)
-    dt_mse = calculate_gini(y_test, y_pred_sklearn)
+    dt_mse = calculate_gini(y_test, y_pred_sklearn,0)
     print(f'Sklearn DT Gini: {dt_mse}')
     
 
