@@ -1,4 +1,4 @@
-name: csdt5
+name: csdt
 channels:
   - conda-forge
   - gurobi

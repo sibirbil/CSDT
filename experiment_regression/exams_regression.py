@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeRegressor
 from sklearn.metrics import mean_squared_error
-from csdt import *
 from sklearn.tree import plot_tree
 import matplotlib.pyplot as plt
 import os
@@ -31,7 +30,7 @@ if __name__ == '__main__':
                      'lunch', 'test preparation course']
     target_list = ['math score','reading score','writing score']
 
-    df = pd.read_csv(os.path.join(base_folder, "data/constrained_exams.csv"))
+    df = pd.read_csv(os.path.join(base_folder, "datasets/constrained_exams.csv"))
     features_df = df[features_list]
     target_df = df[target_list]
 
@@ -48,17 +47,17 @@ if __name__ == '__main__':
     def return_mean(y, x):
         return y.mean(axis=0).astype(np.float64)  
 
-    def calculate_mse(y, predictions):
+    def calculate_mse(y, predictions,initial_solutions):
         mse = mean_squared_error(y, predictions)
         return np.float64(mse)  
 
-    split_criteria = lambda y, x: split_criteria_with_methods(
-        y.astype(np.float64), x.astype(np.float64), pred=return_mean, split_criteria=calculate_mse
+    split_criteria = lambda y, x,initial_solutions: split_criteria_with_methods(
+        y.astype(np.float64), x.astype(np.float64), pred=return_mean, split_criteria=calculate_mse,initial_solutions=initial_solutions
     )
 
     tree = CSDT(max_depth=ocdt_depth, min_samples_leaf=ocdt_min_samples_leaf, min_samples_split=ocdt_min_samples_split,
                 split_criteria=split_criteria,
-                verbose=verbose)
+                verbose=verbose, use_hashmaps=True,use_initial_solution=True)
 
     tree.fit(X_train, y_train)
 

@@ -55,16 +55,16 @@ y = data[["target"]]
 def return_mean(y, x):
         return y.mean(axis=0).astype(np.float64)  
 
-def calculate_mse(y, predictions):
+def calculate_mse(y, predictions,initial_solutions):
     errors = y - predictions
     squared_errors = errors ** 2
     mse = np.mean(squared_errors)
     return np.float64(mse)
         
-split_criteria = lambda y, x: split_criteria_with_methods(y, x,pred=return_mean, split_criteria= calculate_mse
+split_criteria = lambda y, x,initial_solutions: split_criteria_with_methods(y, x,pred=return_mean, split_criteria= calculate_mse,initial_solutions=initial_solutions
             )
 # Initialize the tree
-tree = CSDT(max_depth=3, min_samples_split=2, min_samples_leaf=1, verbose=True,split_criteria=split_criteria)
+tree = CSDT(max_depth=3, min_samples_split=2, min_samples_leaf=1, verbose=True,split_criteria=split_criteria,use_hashmaps=True,use_initial_solution=True)
 
 # Fit the tree
 tree.fit(X, y)
