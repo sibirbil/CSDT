@@ -2,7 +2,12 @@
 import time
 import numpy as np
 import pandas as pd
+from sklearn import preprocessing
+import matplotlib.pyplot as plt
+import re
 from graphviz import Digraph
+from graphviz import Graph
+from sklearn.metrics import mean_squared_error
 
 
 class Node:
@@ -23,6 +28,8 @@ class Node:
         self.function = None
         self.error = None
         self.best_score= None
+        
+        
     """
     A node in the decision tree.
 
@@ -54,6 +61,9 @@ class CSDT:
         min_samples_leaf (int): Minimum number of samples required in a leaf node.
         min_samples_split (int): Minimum number of samples required to split a node.
         split_criteria (function): A function to evaluate the quality of a split.
+        ccp_alpha (float): Complexity parameter for cost complexity pruning (not implemented).
+        max_features (int, float, or str): Maximum number of features to consider for splitting.
+        random_state (int): Random seed for reproducibility.
         verbose (bool): Whether to display verbose output.
         Tree (Node): The root node of the tree.
     """
@@ -62,6 +72,11 @@ class CSDT:
                  min_samples_leaf = 5,
                  min_samples_split = 10,
                  split_criteria = None,
+                 ccp_alpha=0.0,
+                 max_features=None,
+                 random_state=None,
+                 use_hashmaps = False,
+                 use_initial_solution = False,
                  verbose = False):
         
         self.max_depth = max_depth
@@ -69,6 +84,13 @@ class CSDT:
         self.min_samples_split = min_samples_split
         self.split_criteria = split_criteria
         self.verbose = verbose
+        #self.ccp_alpha = ccp_alpha  # Yeni ccp_alpha değişkeni
+        self.max_features = max_features
+        self.random_state = random_state
+        self.rng = np.random.default_rng(random_state)
+        self.use_hashmaps = use_hashmaps
+        self.use_initial_solution = use_initial_solution
+
         self.Tree = None
     def buildDT(self, features, labels, node):
         """
@@ -82,7 +104,7 @@ class CSDT:
         Returns:
             None: Modifies the `node` in place to build the tree structure.
         """
-        node.prediction, node.error = self.split_criteria(labels.to_numpy(), features.to_numpy())
+        node.prediction, node.error = self.split_criteria(labels.to_numpy(), features.to_numpy(), self.best_solution)
         node.count = labels.shape[0]
 
         if node.depth >= self.max_depth:
@@ -94,7 +116,7 @@ class CSDT:
             return
 
         split_info, split_gain, n_cuts, best_score = self.calcBestSplitCustom(features, labels)
-        node.best_score = best_score 
+        node.best_score = best_score  # Storing the best score achieved at this split
         if n_cuts == 0:
             node.is_terminal = True
             return
@@ -123,7 +145,43 @@ class CSDT:
 
         self.buildDT(features_left, labels_left, node.left)
         self.buildDT(features_right, labels_right, node.right)
+    """
+    def post_prune(self, node):
+        if node.is_terminal:
+            # Her terminal düğüm için hataya ccp_alpha eklenir.
+            return node.error + self.ccp_alpha, 1  # Bu düğüm için terminal maliyet hesaplanır ve yaprak sayısı 1 olarak döner.
 
+        # Çocuk düğümleri özyinelemeli olarak budanır.
+        if node.left:
+            left_error, left_leaves = self.post_prune(node.left)
+        else:
+            left_error, left_leaves = 0, 0
+
+        if node.right:
+            right_error, right_leaves = self.post_prune(node.right)
+        else:
+            right_error, right_leaves = 0, 0
+
+        # Mevcut düğüm altındaki tüm yaprakların toplam hatası ve yaprak sayısı.
+        current_total_error = left_error + right_error
+        current_total_leaves = left_leaves + right_leaves
+
+        # Cost complexity için her yaprak düğüm için ayrı ayrı ccp_alpha eklenir.
+        cost_complexity = current_total_error + self.ccp_alpha * current_total_leaves
+
+        # Eğer bu düğüm terminal yaprak haline gelirse, sadece kendi hatası ve bir ccp_alpha uygulanır.
+        terminal_cost = node.error + self.ccp_alpha
+
+        # Budama kararı:
+        if terminal_cost < cost_complexity:
+            node.is_terminal = True
+            node.left = None
+            node.right = None
+            return node.error + self.ccp_alpha, 1
+        else:
+            return current_total_error, current_total_leaves
+
+    """
 
     def fit(self, features, labels):
         """
@@ -139,25 +197,66 @@ class CSDT:
 
         start = time.time()
 
+        # Ağaç oluşturma
+        self.features = features
+        self.labels = labels
+        self.preds_dict = {}
         self.Tree = Node()
         self.Tree.depth = 0
         self.Tree.id = 1
-        self.buildDT(features, labels, self.Tree)
+        self.best_solution = np.zeros(self.labels.shape[1])
+        self.best_solution_perf = float('inf')
 
+        self.buildDT(features, labels, self.Tree)
+        """
+        # Post-pruning işlemi (ccp_alpha > 0 ise)
+        if self.ccp_alpha > 0.0:
+            self.post_prune(self.Tree)
+        """
+        # Yaprak düğüm tahminlerini hesaplama
         leaves = self.apply(features)
         leaf_predictions = {}
         for leaf_id in np.unique(leaves):
             leaf_indices = np.where(leaves == leaf_id)[0]
             leaf_labels = labels.iloc[leaf_indices].to_numpy()
             leaf_features = features.iloc[leaf_indices].to_numpy()
-            leaf_predictions[leaf_id], _ = self.split_criteria(leaf_labels, leaf_features)
+            leaf_predictions[leaf_id], _ = self.split_criteria(leaf_labels, leaf_features , self.best_solution)
 
+        # Tahminleri saklama
         self.leaf_predictions_df = pd.DataFrame(leaf_predictions)
 
+        # Eğitim süresini hesaplama
         end = time.time()
         self.training_duration = end - start
 
-    
+    def select_features(self, n_features):
+        """
+        Select a subset of features for splitting based on max_features parameter.
+
+        Args:
+            n_features (int): Total number of features.
+
+        Returns:
+            list: Indices of selected features.
+        """
+
+        if self.max_features is None:
+            return range(n_features)
+        elif isinstance(self.max_features, int):
+            return self.rng.choice(n_features, self.max_features, replace=False)
+        elif isinstance(self.max_features, float):
+            max_feats = int(self.max_features * n_features)
+            return self.rng.choice(n_features, max_feats, replace=False)
+        elif self.max_features == "sqrt":
+            max_feats = int(np.sqrt(n_features))
+            return self.rng.choice(n_features, max_feats, replace=False)
+        elif self.max_features == "log2":
+            max_feats = int(np.log2(n_features))
+            return self.rng.choice(n_features, max_feats, replace=False)
+        else:
+            raise ValueError("Invalid value for max_features")
+
+
     def apply(self, features):
         """
         Returns the node ID for each input object based on the tree traversal.
@@ -210,7 +309,7 @@ class CSDT:
         predictions = self.leaf_predictions_df[leaves].T
 
         return np.asarray(predictions)
-    
+
     
     def calcBestSplitCustom(self, features, labels):
         """
@@ -233,13 +332,14 @@ class CSDT:
         split_perf = np.zeros((n * features.shape[1], n_obj))
         split_info = np.zeros((n * features.shape[1], 2))
         n_features = features.shape[1] 
+        selected_features = self.select_features(n_features)
 
         best_penalty = float('inf')
         best_feature = -1
         best_threshold = float('inf')
         N_t = len(labels)
 
-        for k in range(features.shape[1]):
+        for k in selected_features:
                 
             x = features.iloc[:, k].to_numpy()
             y = labels.to_numpy()
@@ -247,7 +347,7 @@ class CSDT:
             sort_x = x[sort_idx]
             sort_y = y[sort_idx, :]
             
-            for i in range(self.min_samples_leaf -1 , n - self.min_samples_leaf  ):
+            for i in range(self.min_samples_leaf -1 , n - self.min_samples_leaf  ):# -1 i sildim
                 xi = (sort_x[i] + sort_x[i + 1]) / 2
 
                 if sort_x[i] == sort_x[i + 1]:
@@ -256,15 +356,42 @@ class CSDT:
 
                 left_yi = sort_y[:i+1, :]
                 right_yi = sort_y[i+1:, :]
-
-                left_xi = features.to_numpy()[sort_idx][:i+1]
-                right_xi = features.to_numpy()[sort_idx][i+1:]
-
                 left_instance_count = left_yi.shape[0]
                 right_instance_count = right_yi.shape[0]
 
-                left_prediction, left_perf = self.split_criteria(left_yi, left_xi)
-                right_prediction, right_perf = self.split_criteria(right_yi, right_xi)
+                if self.use_hashmaps:
+                    left_idx = tuple(sorted(features.iloc[sort_idx[:i+1]].index))
+                    right_idx = tuple(sorted(features.iloc[sort_idx[i+1:]].index))
+                    
+                    left_xi = features.to_numpy()[sort_idx[:i+1]]
+                    right_xi = features.to_numpy()[sort_idx[i+1:]]
+
+                    if left_idx not in self.preds_dict:
+                        left_prediction, left_perf = self.split_criteria(left_yi, left_xi, self.best_solution)
+                        self.preds_dict[left_idx] = {'preds': left_prediction, 'perf': left_perf}
+                    else:
+                        left_prediction, left_perf = self.preds_dict[left_idx]['preds'], self.preds_dict[left_idx]['perf']
+
+                    if right_idx not in self.preds_dict:
+                        right_prediction, right_perf = self.split_criteria(right_yi, right_xi, self.best_solution)
+                        self.preds_dict[right_idx] = {'preds': right_prediction, 'perf': right_perf}
+                    else:
+                        right_prediction, right_perf = self.preds_dict[right_idx]['preds'], self.preds_dict[right_idx]['perf']
+                else:
+                    left_xi = features.to_numpy()[sort_idx][:i+1]
+                    right_xi = features.to_numpy()[sort_idx][i+1:]
+
+                
+
+                left_prediction, left_perf = self.split_criteria(left_yi, left_xi, self.best_solution)
+                right_prediction, right_perf = self.split_criteria(right_yi, right_xi, self.best_solution)
+                if self.use_initial_solution:
+                    if left_perf < self.best_solution_perf:
+                        self.best_solution_perf = left_perf
+                        self.best_solution = left_prediction
+                    if right_perf < self.best_solution_perf:
+                        self.best_solution_perf = right_perf
+                        self.best_solution = right_prediction
 
                 N_t_L = len(left_yi)
                 N_t_R = len(right_yi)
@@ -272,9 +399,9 @@ class CSDT:
                     continue
 
                 gain = N_t / n
-                node_prediction,node_perf =  self.split_criteria(sort_y, sort_x)
-                left_prediction, left_perf = self.split_criteria(left_yi, left_xi)
-                right_prediction, right_perf = self.split_criteria(right_yi, right_xi)
+                node_prediction,node_perf =  self.split_criteria(sort_y, sort_x, self.best_solution)
+                left_prediction, left_perf = self.split_criteria(left_yi, left_xi, self.best_solution)
+                right_prediction, right_perf = self.split_criteria(right_yi, right_xi, self.best_solution)
                 curr_score = (left_perf * left_instance_count + right_perf * right_instance_count) / n
 
                 split_perf[cut_id, 0] = curr_score
@@ -292,6 +419,7 @@ class CSDT:
 
                 cut_id += 1
 
+        #print(f"Best Split -> Feature Index: {best_feature} | Threshold: {best_threshold} | MSE: {best_penalty}")
 
         split_info = split_info[:cut_id, :]
         split_gain = split_perf[:cut_id, :]
@@ -299,7 +427,7 @@ class CSDT:
         split_gain = split_gain[~np.isnan(split_gain).any(axis=1), :]
         n_cuts = cut_id
 
-        best_score = best_penalty  
+        best_score = best_penalty  # The best penalty score during split evaluation
         return split_info, split_gain, n_cuts, best_score
 
     def draw_tree(self):
@@ -331,7 +459,7 @@ class CSDT:
 
         return dot
 
-def split_criteria_with_methods(y, x, pred, split_criteria): 
+def split_criteria_with_methods(y, x, pred, split_criteria,initial_solutions): 
     """
     Calculate predictions and evaluate split quality using custom methods.
 
@@ -346,6 +474,6 @@ def split_criteria_with_methods(y, x, pred, split_criteria):
     """
     predictions = pred(y.astype(np.float64), x.astype(np.float64))  
     predictions_all = (predictions * np.ones((y.shape[0], y.shape[1]), dtype=np.float64))  
-    split_evaluation = split_criteria(predictions_all.astype(np.float64), y.astype(np.float64))  
+    split_evaluation = split_criteria(predictions_all.astype(np.float64), y.astype(np.float64),initial_solutions)  
 
     return predictions, split_evaluation
