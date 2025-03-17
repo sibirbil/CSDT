@@ -318,8 +318,6 @@ class CSDT:
             Args:
                 features (pd.DataFrame): Input features at the current node.
                 labels (pd.DataFrame): Target values at the current node.
-
-                
             Returns:
                 tuple: 
                     - split_info (np.ndarray): Information about each split.
