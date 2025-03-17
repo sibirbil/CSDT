@@ -310,126 +310,22 @@ class CSDT:
 
         return np.asarray(predictions)
 
-    
-    def calcBestSplitCustom2(self, features, labels):
-        """
-        Find the best feature and threshold for splitting the data at the current node.
 
-        Args:
-            features (pd.DataFrame): Input features at the current node.
-            labels (pd.DataFrame): Target values at the current node.
-
-        Returns:
-            tuple: 
-                - split_info (np.ndarray): Information about each split.
-                - split_gain (np.ndarray): Gain values for each split.
-                - n_cuts (int): Number of possible splits.
-                - best_score (float): The best penalty score achieved during split evaluation.
-        """
-        n = features.shape[0]
-        cut_id = 0
-        n_obj = 1
-        split_perf = np.zeros((n * features.shape[1], n_obj))
-        split_info = np.zeros((n * features.shape[1], 2))
-        n_features = features.shape[1] 
-        selected_features = self.select_features(n_features)
-
-        best_penalty = float('inf')
-        best_feature = -1
-        best_threshold = float('inf')
-        N_t = len(labels)
-
-        for k in selected_features:
-                
-            x = features.iloc[:, k].to_numpy()
-            y = labels.to_numpy()
-            sort_idx = np.argsort(x)
-            sort_x = x[sort_idx]
-            sort_y = y[sort_idx, :]
-            
-            for i in range(self.min_samples_leaf -1 , n - self.min_samples_leaf  ):# -1 i sildim
-                xi = (sort_x[i] + sort_x[i + 1]) / 2
-
-                if sort_x[i] == sort_x[i + 1]:
-     
-                    continue
-
-                left_yi = sort_y[:i+1, :]
-                right_yi = sort_y[i+1:, :]
-                left_instance_count = left_yi.shape[0]
-                right_instance_count = right_yi.shape[0]
-
-                if self.use_hashmaps:
-                    left_idx = tuple(sorted(features.iloc[sort_idx[:i+1]].index))
-                    right_idx = tuple(sorted(features.iloc[sort_idx[i+1:]].index))
-                    
-                    left_xi = features.to_numpy()[sort_idx[:i+1]]
-                    right_xi = features.to_numpy()[sort_idx[i+1:]]
-
-                    if left_idx not in self.preds_dict:
-                        left_prediction, left_perf = self.split_criteria(left_yi, left_xi, self.best_solution)
-                        self.preds_dict[left_idx] = {'preds': left_prediction, 'perf': left_perf}
-                    else:
-                        left_prediction, left_perf = self.preds_dict[left_idx]['preds'], self.preds_dict[left_idx]['perf']
-
-                    if right_idx not in self.preds_dict:
-                        right_prediction, right_perf = self.split_criteria(right_yi, right_xi, self.best_solution)
-                        self.preds_dict[right_idx] = {'preds': right_prediction, 'perf': right_perf}
-                    else:
-                        right_prediction, right_perf = self.preds_dict[right_idx]['preds'], self.preds_dict[right_idx]['perf']
-                else:
-                    left_xi = features.to_numpy()[sort_idx][:i+1]
-                    right_xi = features.to_numpy()[sort_idx][i+1:]
-
-                
-
-                left_prediction, left_perf = self.split_criteria(left_yi, left_xi, self.best_solution)
-                right_prediction, right_perf = self.split_criteria(right_yi, right_xi, self.best_solution)
-                if self.use_initial_solution:
-                    if left_perf < self.best_solution_perf:
-                        self.best_solution_perf = left_perf
-                        self.best_solution = left_prediction
-                    if right_perf < self.best_solution_perf:
-                        self.best_solution_perf = right_perf
-                        self.best_solution = right_prediction
-
-                N_t_L = len(left_yi)
-                N_t_R = len(right_yi)
-                if N_t_R == 0 or N_t_L == 0:
-                    continue
-
-                gain = N_t / n
-                node_prediction,node_perf =  self.split_criteria(sort_y, sort_x, self.best_solution)
-                left_prediction, left_perf = self.split_criteria(left_yi, left_xi, self.best_solution)
-                right_prediction, right_perf = self.split_criteria(right_yi, right_xi, self.best_solution)
-                curr_score = (left_perf * left_instance_count + right_perf * right_instance_count) / n
-
-                split_perf[cut_id, 0] = curr_score
-                split_info[cut_id, 0] = k
-                split_info[cut_id, 1] = xi
-
-                if curr_score < best_penalty:
-                    best_penalty = curr_score
-                    best_feature = k
-                    best_threshold = xi
-                elif curr_score == best_penalty:
-                    if k < best_feature or (k == best_feature and xi < best_threshold):
-                        best_feature = k
-                        best_threshold = xi
-
-                cut_id += 1
-
-        #print(f"Best Split -> Feature Index: {best_feature} | Threshold: {best_threshold} | MSE: {best_penalty}")
-
-        split_info = split_info[:cut_id, :]
-        split_gain = split_perf[:cut_id, :]
-        split_info = split_info[~np.isnan(split_gain).any(axis=1), :]
-        split_gain = split_gain[~np.isnan(split_gain).any(axis=1), :]
-        n_cuts = cut_id
-
-        best_score = best_penalty  # The best penalty score during split evaluation
-        return split_info, split_gain, n_cuts, best_score
     def calcBestSplitCustom(self, features, labels):
+            """
+            Find the best feature and threshold for splitting the data at the current node.
+
+            Args:
+                features (pd.DataFrame): Input features at the current node.
+                labels (pd.DataFrame): Target values at the current node.
+            Returns:
+                tuple: 
+                    - split_info (np.ndarray): Information about each split.
+                    - split_gain (np.ndarray): Gain values for each split.
+                    - n_cuts (int): Number of possible splits.
+                    - best_score (float): The best penalty score achieved during split evaluation.
+            """
+            
             features_np = features.to_numpy()
             labels_np = labels.to_numpy()
 
