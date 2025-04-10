@@ -52,12 +52,12 @@ if __name__ == '__main__':
         return np.float64(mse)  
 
     split_criteria = lambda y, x,initial_solutions: split_criteria_with_methods(
-        y.astype(np.float64), x.astype(np.float64), pred=return_mean, split_criteria=calculate_mse
+        y.astype(np.float64), x.astype(np.float64), pred=return_mean, split_criteria=calculate_mse,initial_solutions=initial_solutions
     )
 
     tree = CSDT(max_depth=csdt_depth, min_samples_leaf=csdt_min_samples_leaf, min_samples_split=csdt_min_samples_split,
                 split_criteria=split_criteria,
-                verbose=verbose, use_hashmaps=True,use_initial_solution=True)
+                verbose=verbose, use_hashmaps=True)
 
     tree.fit(X_train, y_train)
 
