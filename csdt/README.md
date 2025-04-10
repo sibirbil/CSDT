@@ -2,6 +2,9 @@
 
 **CSDT** is a Python library designed for building and using decision trees with custom split criteria. It provides flexibility and control for machine learning projects, allowing users to define custom split logic and visualize the resulting trees.
 
+
+Explore the project on the official website: [Custom Split Decision Tree](https://custom-split-decision-tree.github.io/)
+
 ---
 
 ## Features
@@ -25,7 +28,7 @@ Alternatively, you can clone the repository and install it locally:
 
 ```bash
 git clone https://github.com/sibirbil/CSDT.git
-cd Custom-Split-Decision-Tree
+cd CSDT
 pip install -e .
 ```
 
@@ -61,7 +64,7 @@ def calculate_mse(y, predictions,initial_solutions):
 split_criteria = lambda y, x,initial_solutions: split_criteria_with_methods(y, x,pred=return_mean, split_criteria= calculate_mse,initial_solutions=initial_solutions
             )
 # Initialize the tree
-tree = CSDT(max_depth=3, min_samples_split=2, min_samples_leaf=1, verbose=True,split_criteria=split_criteria,use_hashmaps=True,use_initial_solution=True)
+tree = CSDT(max_depth=3, min_samples_split=2, min_samples_leaf=1, verbose=True,split_criteria=split_criteria,use_hashmaps=True)
 
 # Fit the tree
 tree.fit(X, y)
@@ -82,9 +85,37 @@ To use **CSDT**, make sure you have the following dependencies installed:
 - `matplotlib==3.8.1`
 - `numpy==2.1.0`
 - `pandas==2.2.3`
+- `scikit-learn==1.3.2`
 - `graphviz`
+- `gurobi=10.0.3`
+- `pip=23.3.1`
+- `python=3.11.6`
+- `seaborn=0.12.2`
+- `scipy=1.11.3`
+- `setuptools=68.2.2`
 
+If you use `conda`, you can create an environment with all required dependencies:
 
+```bash
+conda env create -f csdt.yml
+conda activate csdt
+```
+
+---
+
+## Conda Environment Setup
+
+For Conda users, you can create an environment using the provided `csdt.yml` file:
+
+1. Download or copy the `csdt.yml` file.
+2. Create the environment:
+   ```bash
+   conda env create -f csdt.yml
+   ```
+3. Activate the environment:
+   ```bash
+   conda activate csdt
+   ```
 
 ---
 
@@ -111,7 +142,6 @@ Contributions are welcome! If you'd like to contribute, follow these steps:
 - **Çağla Mıdıklı** - [GitHub](https://github.com/cagla0117)
 - **İlker Birbil** - [GitHub](https://github.com/sibirbil)
 - **Doğanay Özese** - [GitHub](https://github.com/dozese)
-
 
 ---
 
