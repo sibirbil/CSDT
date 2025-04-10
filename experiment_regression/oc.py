@@ -21,9 +21,9 @@ np.random.seed(SEED)
 
 base_folder = os.getcwd()
 # Define hyperparameters
-ocdt_min_samples_split = 10
-ocdt_min_samples_leaf = 5
-ocdt_depth = 5
+csdt_min_samples_split = 10
+csdt_min_samples_leaf = 5
+csdt_depth = 5
 verbose = False
 class_target_size = 7
 
@@ -97,9 +97,9 @@ split_criteria = lambda y, x,solution: split_criteria_with_methods(
 )
 verbose = False
 tree = CSDT(
-    max_depth=ocdt_depth,
-    min_samples_leaf=ocdt_min_samples_leaf,
-    min_samples_split=ocdt_min_samples_split,
+    max_depth=csdt_depth,
+    min_samples_leaf=csdt_min_samples_leaf,
+    min_samples_split=csdt_min_samples_split,
     split_criteria=split_criteria,
     verbose=verbose,
     use_hashmaps= True,
@@ -110,14 +110,14 @@ tree = CSDT(
 tree.fit(X_train, y_train)
 
 y_pred = tree.predict(X_test)
-ocdt_mse = mean_squared_error(y_test, y_pred)
-print(f"CSDT MSE: {ocdt_mse}")
+csdt_mse = mean_squared_error(y_test, y_pred)
+print(f"CSDT MSE: {csdt_mse}")
 
 output_folder = "results"
 
 os.makedirs(output_folder, exist_ok=True)
 
-csdt_output_path = os.path.join(output_folder, 'class_ocdt')
+csdt_output_path = os.path.join(output_folder, 'class_csdt')
 dot = tree.draw_tree()
 dot.render(csdt_output_path, format='png', view=True)
 

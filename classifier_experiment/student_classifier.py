@@ -59,7 +59,7 @@ if __name__ == '__main__':
     split_criteria = lambda y, x,initial_solutions: split_criteria_with_methods(y, x, pred=return_majority, split_criteria=calculate_gini,initial_solutions=initial_solutions)
     
     tree = CSDT(max_depth=csdt_depth, min_samples_leaf=csdt_min_samples_leaf, min_samples_split=csdt_min_samples_split,
-                split_criteria=split_criteria, verbose=verbose,use_hashmaps=True,use_initial_solution=True)
+                split_criteria=split_criteria, verbose=verbose,use_hashmaps=True,use_multithreading= True)
     tree.fit(X_train, y_train)
     y_pred = tree.predict(X_test)
     
@@ -67,8 +67,8 @@ if __name__ == '__main__':
     y_pred_df['leaf_id'] = tree.apply(X_test)
     y_pred_df = y_pred_df.drop_duplicates()
     
-    ocdt_mse = calculate_gini(y_test, y_pred,0)
-    print(f'CSDT Gini: {ocdt_mse}')
+    csdt_mse = calculate_gini(y_test, y_pred,0)
+    print(f'CSDT Gini: {csdt_mse}')
 
     classifier = DecisionTreeClassifier( min_samples_leaf=csdt_min_samples_leaf,
                                         min_samples_split=csdt_min_samples_split, max_depth=csdt_depth)

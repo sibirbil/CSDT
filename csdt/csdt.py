@@ -8,6 +8,8 @@ import re
 from graphviz import Digraph
 from graphviz import Graph
 from sklearn.metrics import mean_squared_error
+from concurrent.futures import ThreadPoolExecutor
+
 
 
 class Node:
@@ -77,7 +79,8 @@ class CSDT:
                  random_state=None,
                  use_hashmaps = False,
                  use_initial_solution = False,
-                 verbose = False):
+                 verbose = False,
+                 use_multithreading = False):
         
         self.max_depth = max_depth
         self.min_samples_leaf = min_samples_leaf
@@ -90,6 +93,7 @@ class CSDT:
         self.rng = np.random.default_rng(random_state)
         self.use_hashmaps = use_hashmaps
         self.use_initial_solution = use_initial_solution
+        self.use_multithreading = use_multithreading 
 
         self.Tree = None
     def buildDT(self, features, labels, node):
@@ -311,7 +315,7 @@ class CSDT:
         return np.asarray(predictions)
 
 
-    def calcBestSplitCustom(self, features, labels):
+    def calcBestSplitCustom2(self, features, labels):
             """
             Find the best feature and threshold for splitting the data at the current node.
 
@@ -381,6 +385,126 @@ class CSDT:
 
             best_score = best_penalty
             return split_info, split_gain, n_cuts, best_score
+    
+        
+    def calcBestSplitCustom(self, features, labels):
+        features_np = features.to_numpy()
+        labels_np = labels.to_numpy()
+
+        n, n_features = features_np.shape
+        split_perf = []
+        split_info = []
+        selected_features = self.select_features(n_features)
+
+        best_penalty = float('inf')
+        best_feature = -1
+        best_threshold = float('inf')
+
+        if self.use_multithreading:
+            results = []
+
+            def process_feature(k):
+                x = features_np[:, k]
+                sort_idx = np.argsort(x)
+                sort_x = x[sort_idx]
+                sort_y = labels_np[sort_idx, :]
+                n = len(x)
+
+                split_perf_k = []
+                split_info_k = []
+                best_penalty_k = float('inf')
+                best_threshold_k = None
+
+                for i in range(self.min_samples_leaf - 1, n - self.min_samples_leaf):
+                    if sort_x[i] == sort_x[i + 1]:
+                        continue
+
+                    xi = (sort_x[i] + sort_x[i + 1]) / 2
+                    left_yi = sort_y[:i + 1, :]
+                    right_yi = sort_y[i + 1:, :]
+                    left_xi = features_np[sort_idx[:i + 1]]
+                    right_xi = features_np[sort_idx[i + 1:]]
+
+                    left_prediction, left_perf = self.split_criteria(left_yi, left_xi, self.best_solution)
+                    right_prediction, right_perf = self.split_criteria(right_yi, right_xi, self.best_solution)
+
+                    N_t = n
+                    N_t_L = len(left_yi)
+                    N_t_R = len(right_yi)
+                    if N_t_R == 0 or N_t_L == 0:
+                        continue
+
+                    curr_score = (left_perf * N_t_L + right_perf * N_t_R) / N_t
+                    split_perf_k.append(curr_score)
+                    split_info_k.append([k, xi])
+
+                    if curr_score < best_penalty_k or (curr_score == best_penalty_k and xi < best_threshold_k):
+                        best_penalty_k = curr_score
+                        best_threshold_k = xi
+
+                return split_info_k, split_perf_k, best_penalty_k, k, best_threshold_k
+
+            with ThreadPoolExecutor() as executor:
+                futures = [executor.submit(process_feature, k) for k in selected_features]
+                for future in futures:
+                    result = future.result()
+                    results.append(result)
+
+            for split_info_k, split_perf_k, penalty_k, k_k, threshold_k in results:
+                split_info.extend(split_info_k)
+                split_perf.extend(split_perf_k)
+
+                if penalty_k < best_penalty or (penalty_k == best_penalty and (k_k < best_feature or (k_k == best_feature and threshold_k < best_threshold))):
+                    best_penalty = penalty_k
+                    best_feature = k_k
+                    best_threshold = threshold_k
+
+        else:
+            for k in selected_features:
+                x = features_np[:, k]
+                sort_idx = np.argsort(x)
+                sort_x = x[sort_idx]
+                sort_y = labels_np[sort_idx, :]
+
+                for i in range(self.min_samples_leaf - 1, n - self.min_samples_leaf):
+                    if sort_x[i] == sort_x[i + 1]:
+                        continue
+
+                    xi = (sort_x[i] + sort_x[i + 1]) / 2
+                    left_yi = sort_y[:i + 1, :]
+                    right_yi = sort_y[i + 1:, :]
+                    left_xi = features_np[sort_idx[:i + 1]]
+                    right_xi = features_np[sort_idx[i + 1:]]
+
+                    left_prediction, left_perf = self.split_criteria(left_yi, left_xi, self.best_solution)
+                    right_prediction, right_perf = self.split_criteria(right_yi, right_xi, self.best_solution)
+
+                    N_t = n
+                    N_t_L = len(left_yi)
+                    N_t_R = len(right_yi)
+                    if N_t_R == 0 or N_t_L == 0:
+                        continue
+
+                    curr_score = (left_perf * N_t_L + right_perf * N_t_R) / N_t
+                    split_perf.append(curr_score)
+                    split_info.append([k, xi])
+
+                    if curr_score < best_penalty or (curr_score == best_penalty and (k < best_feature or (k == best_feature and xi < best_threshold))):
+                        best_penalty = curr_score
+                        best_feature = k
+                        best_threshold = xi
+
+        split_info = np.array(split_info)
+        split_gain = np.array(split_perf).reshape(-1, 1)
+        n_cuts = len(split_perf)
+
+        best_score = best_penalty
+        return split_info, split_gain, n_cuts, best_score
+
+
+
+
+
     def draw_tree(self):
         """
         Create a visual representation of the decision tree using Graphviz.
