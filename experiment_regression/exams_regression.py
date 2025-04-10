@@ -21,11 +21,11 @@ base_folder = os.getcwd()
 from sklearn.metrics.pairwise import euclidean_distances
 
 if __name__ == '__main__':
-    ocdt_min_samples_split = 10
-    ocdt_min_samples_leaf = 5
+    csdt_min_samples_split = 10
+    csdt_min_samples_leaf = 5
     verbose = False
 
-    ocdt_depth = 15
+    csdt_depth = 15
     features_list = ['gender', 'race/ethnicity', 'parental level of education',
                      'lunch', 'test preparation course']
     target_list = ['math score','reading score','writing score']
@@ -52,10 +52,10 @@ if __name__ == '__main__':
         return np.float64(mse)  
 
     split_criteria = lambda y, x,initial_solutions: split_criteria_with_methods(
-        y.astype(np.float64), x.astype(np.float64), pred=return_mean, split_criteria=calculate_mse,initial_solutions=initial_solutions
+        y.astype(np.float64), x.astype(np.float64), pred=return_mean, split_criteria=calculate_mse
     )
 
-    tree = CSDT(max_depth=ocdt_depth, min_samples_leaf=ocdt_min_samples_leaf, min_samples_split=ocdt_min_samples_split,
+    tree = CSDT(max_depth=csdt_depth, min_samples_leaf=csdt_min_samples_leaf, min_samples_split=csdt_min_samples_split,
                 split_criteria=split_criteria,
                 verbose=verbose, use_hashmaps=True,use_initial_solution=True)
 
@@ -66,14 +66,14 @@ if __name__ == '__main__':
     y_pred_df['leaf_id'] = tree.apply(X_test)
     y_pred_df = y_pred_df.drop_duplicates()
 
-    ocdt_mse = mean_squared_error(y_test, y_pred)
-    print(f'CSDT MSE: {ocdt_mse}')
+    csdt_mse = mean_squared_error(y_test, y_pred)
+    print(f'CSDT MSE: {csdt_mse}')
 
     regressor = DecisionTreeRegressor(
         random_state=20,
-        min_samples_leaf=ocdt_min_samples_leaf,
-        min_samples_split=ocdt_min_samples_split,
-        max_depth=ocdt_depth
+        min_samples_leaf=csdt_min_samples_leaf,
+        min_samples_split=csdt_min_samples_split,
+        max_depth=csdt_depth
     )
 
     regressor.fit(X_train, y_train)
@@ -86,7 +86,7 @@ if __name__ == '__main__':
 
     os.makedirs(output_folder, exist_ok=True)
 
-    csdt_output_path = os.path.join(output_folder, 'exams_ocdt')
+    csdt_output_path = os.path.join(output_folder, 'exams_csdt')
     dot = tree.draw_tree()
     dot.render(csdt_output_path, format='png', view=True)
 
