@@ -87,7 +87,6 @@ class CSDT:
         self.min_samples_split = min_samples_split
         self.split_criteria = split_criteria
         self.verbose = verbose
-        #self.ccp_alpha = ccp_alpha  # Yeni ccp_alpha değişkeni
         self.max_features = max_features
         self.random_state = random_state
         self.rng = np.random.default_rng(random_state)
@@ -149,43 +148,7 @@ class CSDT:
 
         self.buildDT(features_left, labels_left, node.left)
         self.buildDT(features_right, labels_right, node.right)
-    """
-    def post_prune(self, node):
-        if node.is_terminal:
-            # Her terminal düğüm için hataya ccp_alpha eklenir.
-            return node.error + self.ccp_alpha, 1  # Bu düğüm için terminal maliyet hesaplanır ve yaprak sayısı 1 olarak döner.
-
-        # Çocuk düğümleri özyinelemeli olarak budanır.
-        if node.left:
-            left_error, left_leaves = self.post_prune(node.left)
-        else:
-            left_error, left_leaves = 0, 0
-
-        if node.right:
-            right_error, right_leaves = self.post_prune(node.right)
-        else:
-            right_error, right_leaves = 0, 0
-
-        # Mevcut düğüm altındaki tüm yaprakların toplam hatası ve yaprak sayısı.
-        current_total_error = left_error + right_error
-        current_total_leaves = left_leaves + right_leaves
-
-        # Cost complexity için her yaprak düğüm için ayrı ayrı ccp_alpha eklenir.
-        cost_complexity = current_total_error + self.ccp_alpha * current_total_leaves
-
-        # Eğer bu düğüm terminal yaprak haline gelirse, sadece kendi hatası ve bir ccp_alpha uygulanır.
-        terminal_cost = node.error + self.ccp_alpha
-
-        # Budama kararı:
-        if terminal_cost < cost_complexity:
-            node.is_terminal = True
-            node.left = None
-            node.right = None
-            return node.error + self.ccp_alpha, 1
-        else:
-            return current_total_error, current_total_leaves
-
-    """
+ 
 
     def fit(self, features, labels):
         """
@@ -201,7 +164,6 @@ class CSDT:
 
         start = time.time()
 
-        # Ağaç oluşturma
         self.features = features
         self.labels = labels
         self.preds_dict = {}
@@ -217,7 +179,6 @@ class CSDT:
         if self.ccp_alpha > 0.0:
             self.post_prune(self.Tree)
         """
-        # Yaprak düğüm tahminlerini hesaplama
         leaves = self.apply(features)
         leaf_predictions = {}
         for leaf_id in np.unique(leaves):
@@ -226,10 +187,8 @@ class CSDT:
             leaf_features = features.iloc[leaf_indices].to_numpy()
             leaf_predictions[leaf_id], _ = self.split_criteria(leaf_labels, leaf_features , self.best_solution)
 
-        # Tahminleri saklama
         self.leaf_predictions_df = pd.DataFrame(leaf_predictions)
 
-        # Eğitim süresini hesaplama
         end = time.time()
         self.training_duration = end - start
 
@@ -380,7 +339,7 @@ class CSDT:
                         best_threshold = xi
 
             split_info = np.array(split_info)
-            split_gain = np.array(split_perf).reshape(-1, 1)  # BURASI DÜZELTİLDİ
+            split_gain = np.array(split_perf).reshape(-1, 1) 
             n_cuts = len(split_perf)
 
             best_score = best_penalty
