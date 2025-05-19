@@ -78,7 +78,7 @@ if __name__ == '__main__':
 
     regressor.fit(X_train, y_train)
     y_pred_sklearn = regressor.predict(X_test)
-    y_pred_sklearn_df = pd.DataFrame(y_pred_sklearn, columns=target_list, dtype=np.float64)  # Ensure 64-bit precision
+    y_pred_sklearn_df = pd.DataFrame(y_pred_sklearn, columns=target_list, dtype=np.float64)  
 
     dt_mse = mean_squared_error(y_test, y_pred_sklearn)
     print(f'Sklearn DT MSE: {dt_mse}')
