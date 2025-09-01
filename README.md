@@ -64,7 +64,7 @@ def calculate_mse(y, predictions,initial_solutions):
 split_criteria = lambda y, x,initial_solutions: split_criteria_with_methods(y, x,pred=return_mean, split_criteria= calculate_mse,initial_solutions=initial_solutions
             )
 # Initialize the tree
-tree = CSDT(max_depth=3, min_samples_split=2, min_samples_leaf=1, verbose=True,split_criteria=split_criteria,use_hashmaps=True,use_initial_solution=True)
+tree = CSDT(max_depth=3, min_samples_split=2, min_samples_leaf=1, verbose=True,split_criteria=split_criteria,use_hashmaps=True)
 
 # Fit the tree
 tree.fit(X, y)
